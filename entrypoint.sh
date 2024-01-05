@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+echo "${PWD}"
+
 IFACE=$(ip route show default | awk '{print $5}')
 IPv4=$(ifconfig "$IFACE" | awk '/inet /{print $2}' | cut -d' ' -f2)
 IPv6=$(ifconfig "$IFACE" | awk '/inet6 /{print $2}' | cut -d' ' -f2)
