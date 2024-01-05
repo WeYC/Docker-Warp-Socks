@@ -22,4 +22,13 @@ sed -i "/\[Interface\]/a PostUp = ip -4 rule add from ${IPv4} lookup main" /opt/
 
 wg-quick up warp
 
+echo "wgcf status"
+wgcf status
+
+echo
+echo "OK, wgcf is up."
+
+sleep infinity &
+wait
+
 exec "$@"
