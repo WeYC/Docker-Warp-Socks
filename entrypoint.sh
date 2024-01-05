@@ -9,7 +9,7 @@ if [ ! -e "/opt/wgcf/wgcf-account.toml" ]; then
     wgcf register --accept-tos
 fi
 
-if [ ! -e "/opt/wgcf/wgcf-profile.conf"]; then
+if [ ! -e "/opt/wgcf/wgcf-profile.conf" ]; then
     wgcf generate
 fi
 
