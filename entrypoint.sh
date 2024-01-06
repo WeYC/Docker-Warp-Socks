@@ -31,27 +31,8 @@ ArchAffix() {
     esac
 }
 
-# 检测 VPS 的出站 IP
-Check_ip() {
-    echo "正在获取 IPv4 地址..."
-    ipv4=$(curl -s4m10 ipinfo.io/ip -k | true)
-    echo "正在获取 IPv6 地址..."
-    ipv6=$(curl -s6m10 v6.ipinfo.io/ip -k | true)
-}
-
 init() {
     green "正在初始化..."
-
-    green "检测IP..."
-    Check_ip
-
-    if [[ -n ${ipv4} || -n ${ipv6} ]]; then
-        echo "IPv4: $ipv4"
-        echo "IPv6: $ipv6"
-    else
-        red "无网络连接"
-        exit 1
-    fi
 
     IFACE=$(ip route show default | awk '{print $5}')
     IPv4=$(ifconfig "$IFACE" | awk '/inet /{print $2}' | cut -d' ' -f2)
