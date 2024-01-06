@@ -73,44 +73,6 @@ Change_WireGuardProfile_V6() {
     sed -i "/\[Interface\]/a PostUp = ip -6 rule add from ${IPv6} lookup main" /opt/wgcf/wgcf-profile.conf
 }
 
-Endpoint_pref() {
-    # 下载优选工具软件，感谢某匿名网友的分享的优选工具
-    # wget https://gitlab.com/Misaka-blog/warp-script/-/raw/main/files/warp-yxip/warp-linux-$(ArchAffix) -O warp
-
-    if [ ! -e "/opt/wgcf/warp.tar.gz" ]; then
-        echo "warp.tar.gz not found"
-        exit 1
-    fi
-
-    Endpoint4
-
-    # 取消 Linux 自带的线程限制，以便生成优选 Endpoint IP
-    ulimit -n 102400
-
-    # 启动 WARP Endpoint IP 优选工具
-    chmod +x warp && ./warp >/dev/null 2>&1
-
-    # 显示前十个优选 Endpoint IP 及使用方法
-    green "当前最优 Endpoint IP 结果如下，并已保存至 result.csv中："
-    cat result.csv | awk -F, '$3!="timeout ms" {print} ' | sort -t, -nk2 -nk3 | uniq | head -11 | awk -F, '{print "端点 "$1" 丢包率 "$2" 平均延迟 "$3}'
-    echo ""
-    yellow "使用方法如下："
-    yellow "1. 将 WireGuard 节点的默认的 Endpoint IP：engage.cloudflareclient.com:2408 替换成本地网络最优的 Endpoint IP"
-    
-    # 将 result.csv 文件的优选 Endpoint IP 提取出来，放置到 best_endpoint 变量中备用
-    best_endpoint=$(cat result.csv | sed -n 2p | awk -F ',' '{print $1}')
-    
-    # 查询优选出来的 Endpoint IP 的 loss 是否为 100.00%，如是，则替换为默认的 Endpoint IP
-    endpoint_loss=$(cat result.csv | sed -n 2p | awk -F ',' '{print $2}')
-    if [[ $endpoint_loss == "100.00%" ]]; then
-        yellow "优选失败"
-    else
-        yellow "优选成功"
-        # 替换 WireGuard 节点的默认的 Endpoint IP
-        sed -i "/Endpoint/s/.*/Endpoint = "$best_endpoint"/" /opt/warp/wgcf-profile.conf
-    fi
-}
-
 Endpoint4() {
     # 生成优选 WARP IPv4 Endpoint IP 段列表
     n=0
@@ -158,13 +120,13 @@ Endpoint4() {
         fi
     done
     while true; do
-        if [ $(echo ${temp[@]} | sed -e 's/ /\n/g' | sort -u | wc -l) -ge $iplist ]; then
+        if [[ $(echo "${temp[@]}" | sed -e 's/ /\n/g' | sort -u | wc -l) -ge $iplist ]]; then
             break
         else
-            temp[$n]=$(echo 162.159.192.$(($RANDOM % 256)))
+            temp["${n}"]=$(echo 162.159.192.$(($RANDOM % 256)))
             n=$(($n + 1))
         fi
-        if [ $(echo ${temp[@]} | sed -e 's/ /\n/g' | sort -u | wc -l) -ge $iplist ]; then
+        if [[ $(echo "${temp[@]}" | sed -e 's/ /\n/g' | sort -u | wc -l) -ge $iplist ]]; then
             break
         else
             temp[$n]=$(echo 162.159.193.$(($RANDOM % 256)))
@@ -209,7 +171,7 @@ Endpoint4() {
     done
 
     # 将生成的 IP 段列表放到 ip.txt 里，待程序优选
-    echo ${temp[@]} | sed -e 's/ /\n/g' | sort -u >ip.txt
+    echo "${temp[@]}" | sed -e 's/ /\n/g' | sort -u >ip.txt
 }
 
 Start() {
