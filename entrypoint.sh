@@ -57,7 +57,7 @@ init() {
 
     Change_WireGuardProfile_V4
     Change_WireGuardProfile_V6
-    
+
     cp -rf /opt/wgcf/wgcf-profile.conf /etc/wireguard/warp.conf
 
     start
@@ -247,7 +247,7 @@ Start() {
 }
 
 if command -v wgcf >/dev/null 2>&1; then
-    echo "curl 已经安装"
+    init
 else
-    echo "curl 未安装"
+    exec "$@"
 fi
