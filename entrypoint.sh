@@ -62,7 +62,7 @@ init() {
 
     cp -rf /opt/wgcf/wgcf-profile.conf /etc/wireguard/warp.conf
 
-    start
+    Start
 }
 
 Change_WireGuardProfile_V4() {
