@@ -2,11 +2,6 @@
 
 set -e
 
-RED="\033[31m"
-GREEN="\033[32m"
-YELLOW="\033[33m"
-PLAIN='\033[0m'
-
 red() {
     echo -e "\033[31m\033[01m$1\033[0m"
 }
@@ -38,13 +33,13 @@ ArchAffix() {
 
 # 检测 VPS 的出站 IP
 check_ip() {
-    ipv4=$(curl -s4m8 ipinfo.io/ip -k | sed -n 1p)
-    ipv6=$(curl -s6m8 ipinfo.io/ip -k | sed -n 1p)
+    ipv4=$(curl -s4m10 ipinfo.io/ip -k)
+    ipv6=$(curl -s6m10 v6.ipinfo.io/ip -k)
 }
 
 init() {
     check_ip
-    if [ -n $ipv4 || -n $ipv6 ]; then
+    if [[ -n ${ipv4} || -n ${ipv6} ]]; then
         red "无网络连接"
         exit 1
     fi
@@ -82,16 +77,8 @@ Endpoint_pref() {
     # 下载优选工具软件，感谢某匿名网友的分享的优选工具
     # wget https://gitlab.com/Misaka-blog/warp-script/-/raw/main/files/warp-yxip/warp-linux-$(ArchAffix) -O warp
 
-    TAR="https://api.github.com/repos/XIU2/CloudflareSpeedTest/releases/latest"
-    ARCH=$(ArchAffix)
-    echo "${ARCH}"
-    URL=$(curl -fsSL ${TAR} | grep 'browser_download_url' | cut -d'"' -f4 | grep linux | grep "$(ArchAffix)")
-    echo "${URL}"
-    if wget "${URL}" -O warp.tar.gz >/dev/null 2>&1; then
-        tar -xzf warp.tar.gz
-        mv CloudflareST warp
-    else
-        echo "下载失败"
+    if [ ! -e "/opt/wgcf/warp.tar.gz" ]; then
+        echo "warp.tar.gz not found"
         exit 1
     fi
 

@@ -17,6 +17,9 @@ WORKDIR /opt/wgcf
 
 VOLUME /opt/wgcf
 
+COPY download.sh /tmp/download.sh
+RUN chmod +x /tmp/download.sh && /tmp/download.sh
+
 COPY entrypoint.sh /run/entrypoint.sh
 RUN chmod +x /run/entrypoint.sh
 
