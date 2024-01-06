@@ -18,7 +18,7 @@ echo "${ARCH}"
 URL=$(curl -fsSL ${TAR} | grep 'browser_download_url' | cut -d'"' -f4 | grep linux | grep "$(ArchAffix)")
 echo "${URL}"
 
-if wget "${URL}" -O /opt/wgcf/warp.tar.gz >/dev/null 2>&1; then
+if wget "${URL}" -O /opt/wgcf/warp.tar.gz 2>&1; then
     echo "Download success"
 else
     echo "Download failed"
