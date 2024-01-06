@@ -5,7 +5,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ="Asia/Shanghai"
 
 RUN apt-get -qq update \
-    && apt-get -qq install curl wget net-tools \
+    && apt-get -qq install curl net-tools \
     && apt-get -qq install --no-install-recommends dante-server wireguard-tools iproute2 procps iptables openresolv kmod \
     && apt-get -qq autoremove --purge && apt-get clean && rm -rf /var/lib/apt/lists/*
 
