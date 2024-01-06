@@ -82,6 +82,8 @@ Endpoint_pref() {
         exit 1
     fi
 
+    Endpoint4
+
     # 取消 Linux 自带的线程限制，以便生成优选 Endpoint IP
     ulimit -n 102400
 
@@ -208,9 +210,6 @@ Endpoint4() {
 
     # 将生成的 IP 段列表放到 ip.txt 里，待程序优选
     echo ${temp[@]} | sed -e 's/ /\n/g' | sort -u >ip.txt
-
-    # 启动优选程序
-    Endpoint_pref
 }
 
 Start() {
