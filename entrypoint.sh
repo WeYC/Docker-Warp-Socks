@@ -32,17 +32,19 @@ ArchAffix() {
 }
 
 # 检测 VPS 的出站 IP
-check_ip() {
+Check_ip() {
     ipv4=$(curl -s4m10 ipinfo.io/ip -k)
     ipv6=$(curl -s6m10 v6.ipinfo.io/ip -k)
 }
 
 init() {
-    check_ip
+    Check_ip
+
     if [[ -n ${ipv4} || -n ${ipv6} ]]; then
         red "无网络连接"
         exit 1
     fi
+
     IFACE=$(ip route show default | awk '{print $5}')
     IPv4=$(ifconfig "$IFACE" | awk '/inet /{print $2}' | cut -d' ' -f2)
     IPv6=$(ifconfig "$IFACE" | awk '/inet6 /{print $2}' | cut -d' ' -f2)
@@ -58,7 +60,7 @@ init() {
     Change_WireGuardProfile_V4
     Change_WireGuardProfile_V6
 
-    endpoint_pref
+    Endpoint_pref
 
     cp -rf /opt/wgcf/wgcf-profile.conf /etc/wireguard/warp.conf
 
@@ -75,7 +77,7 @@ Change_WireGuardProfile_V6() {
     sed -i "/\[Interface\]/a PostUp = ip -6 rule add from ${IPv6} lookup main" /opt/wgcf/wgcf-profile.conf
 }
 
-endpoint_pref() {
+Endpoint_pref() {
     # 下载优选工具软件，感谢某匿名网友的分享的优选工具
     # wget https://gitlab.com/Misaka-blog/warp-script/-/raw/main/files/warp-yxip/warp-linux-$(archAffix) -O warp
     TAR="https://api.github.com/repos/XIU2/CloudflareSpeedTest/releases/latest"
@@ -235,8 +237,7 @@ Start() {
     echo
     green "OK, wgcf is up."
 
-    sleep infinity
-    wait
+    sleep infinity & wait
 }
 
 if command -v wgcf >/dev/null 2>&1; then
