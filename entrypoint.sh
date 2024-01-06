@@ -240,8 +240,10 @@ Start() {
     sleep infinity & wait
 }
 
-if command -v wgcf >/dev/null 2>&1; then
-    init
-else
-    exec "$@"
-fi
+init
+exec "$@"
+# if command -v wgcf >/dev/null 2>&1; then
+#     init
+# else
+#     exec "$@"
+# fi
