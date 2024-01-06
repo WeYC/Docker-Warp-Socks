@@ -187,7 +187,7 @@ Start() {
     wait
 }
 
-if [ $(wg-quick down wgcf) ]; then
+if ! wg-quick down wgcf; then
     init
 else
     exec "$@"
