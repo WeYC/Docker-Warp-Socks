@@ -18,7 +18,7 @@ echo "${ARCH}"
 URL=$(curl -fsSL ${TAR} | grep 'browser_download_url' | cut -d'"' -f4 | grep linux | grep "$(ArchAffix)")
 echo "${URL}"
 
-if curl -sSL "${URL}" -o /opt/wgcf/warp.tar.gz 2>&1; then
+if curl -sSL "${URL}" -o /opt/wgcf/CloudflareST.tar.gz 2>&1; then
     echo "Download success"
 else
     echo "Download failed"
