@@ -38,6 +38,9 @@ Check_ip() {
 }
 
 init() {
+    green "正在初始化..."
+
+    green "检测IP..."
     Check_ip
 
     if [[ -n ${ipv4} || -n ${ipv6} ]]; then
@@ -60,8 +63,10 @@ init() {
     Change_WireGuardProfile_V4
     Change_WireGuardProfile_V6
 
+    green "优选IP..."
     Endpoint_pref
 
+    green "复制配置文件..."
     cp -rf /opt/wgcf/wgcf-profile.conf /etc/wireguard/warp.conf
 
     Start
@@ -125,6 +130,7 @@ Endpoint_pref() {
 
 Endpoint4() {
     # 生成优选 WARP IPv4 Endpoint IP 段列表
+    green "生成优选 WARP IPv4 Endpoint IP 段列表..."
     n=0
     iplist=100
     while true; do
@@ -221,10 +227,12 @@ Endpoint4() {
     done
 
     # 将生成的 IP 段列表放到 ip.txt 里，待程序优选
+    green "将生成的 IP 段列表放到 ip.txt 里，待程序优选..."
     echo "${temp[@]}" | sed -e 's/ /\n/g' | sort -u >ip.txt
 }
 
 Start() {
+    green "开始运行..."
     wg-quick up warp
 
     green "wgcf status"
@@ -240,6 +248,7 @@ Start() {
     sleep infinity & wait
 }
 
+green "启动"
 init
 exec "$@"
 # if command -v wgcf >/dev/null 2>&1; then
