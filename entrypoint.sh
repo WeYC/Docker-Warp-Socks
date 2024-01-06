@@ -33,7 +33,9 @@ ArchAffix() {
 
 # 检测 VPS 的出站 IP
 Check_ip() {
+    echo "正在获取 IPv4 地址..."
     ipv4=$(curl -s4m10 ipinfo.io/ip -k)
+    echo "正在获取 IPv6 地址..."
     ipv6=$(curl -s6m10 v6.ipinfo.io/ip -k)
 }
 
@@ -44,6 +46,9 @@ init() {
     Check_ip
 
     if [[ -n ${ipv4} || -n ${ipv6} ]]; then
+        echo "IPv4: $ipv4"
+        echo "IPv6: $ipv6"
+    else
         red "无网络连接"
         exit 1
     fi
@@ -228,7 +233,7 @@ Endpoint4() {
 
     # 将生成的 IP 段列表放到 ip.txt 里，待程序优选
     green "将生成的 IP 段列表放到 ip.txt 里，待程序优选..."
-    echo "${temp[@]}" | sed -e 's/ /\n/g' | sort -u >ip.txt
+    echo "${temp[@]}" | sed -e 's/ /\n/g' | sort -u > ip.txt
 }
 
 Start() {
