@@ -34,9 +34,9 @@ ArchAffix() {
 # 检测 VPS 的出站 IP
 Check_ip() {
     echo "正在获取 IPv4 地址..."
-    ipv4=$(curl -s4m10 ipinfo.io/ip -k)
+    ipv4=$(curl -s4m10 ipinfo.io/ip -k | true)
     echo "正在获取 IPv6 地址..."
-    ipv6=$(curl -s6m10 v6.ipinfo.io/ip -k)
+    ipv6=$(curl -s6m10 v6.ipinfo.io/ip -k | true)
 }
 
 init() {
