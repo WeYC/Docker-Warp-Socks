@@ -58,6 +58,8 @@ init() {
     Change_WireGuardProfile_V4
     Change_WireGuardProfile_V6
 
+    endpoint_pref
+
     cp -rf /opt/wgcf/wgcf-profile.conf /etc/wireguard/warp.conf
 
     start
@@ -81,30 +83,17 @@ endpoint_pref() {
     echo "${ARCH}"
     URL=$(curl -fsSL ${TAR} | grep 'browser_download_url' | cut -d'"' -f4 | grep linux | grep "$(ArchAffix)")
     echo "${URL}"
-    # if wget "${URL}" -O warp.tar.gz >/dev/null 2>&1; then
-    #     tar -xzf warp.tar.gz
-    #     mv CloudflareST warp
-    # else
-    #     echo "下载失败"
-    #     exit 1
-    # fi
 
     tar -xzf CloudflareST.tar.gz
 
-    # if [ ! -e "/warp/CloudflareST" ]; then
-    #     echo "CloudflareST not found"
-    #     exit 0
-    # fi
-
     # 取消 Linux 自带的线程限制，以便生成优选 Endpoint IP
-    # ulimit -n 102400
+    ulimit -n 102400
 
     endpoint4
 
     # 启动 WARP Endpoint IP 优选工具
     chmod +x CloudflareST && ./CloudflareST >/dev/null 2>&1
 
-    # 显示前十个优选 Endpoint IP 及使用方法
     green "当前最优 Endpoint IP 结果如下，并已保存至 result.csv中："
     cat result.csv | awk -F, '$3!="timeout ms" {print} ' | sort -t, -nk2 -nk3 | uniq | head -11 | awk -F, '{print "端点 "$1" 丢包率 "$2" 平均延迟 "$3}'
     # 将 result.csv 文件的优选 Endpoint IP 提取出来，放置到 best_endpoint 变量中备用
@@ -119,7 +108,7 @@ endpoint_pref() {
     else
         yellow "优选成功"
         # 替换 WireGuard 节点的默认的 Endpoint IP
-        sed -i "/Endpoint/s/.*/Endpoint = "$best_endpoint"/" wgcf-profile.conf
+        sed -i "s|Endpoint = .*|Endpoint = $best_endpoint|" wgcf-profile.conf
     fi
 
     green "最佳 Endpoint IP = $best_endpoint 已设置完毕！"
@@ -238,6 +227,10 @@ Start() {
 
     green "wgcf status"
     wgcf status
+
+    echo
+    echo "checking network..."
+    curl -fs https://www.cloudflare.com/cdn-cgi/trace
 
     echo
     green "OK, wgcf is up."
