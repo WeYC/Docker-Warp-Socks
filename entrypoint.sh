@@ -89,7 +89,7 @@ endpoint_pref() {
     # 取消 Linux 自带的线程限制，以便生成优选 Endpoint IP
     ulimit -n 102400
 
-    endpoint4
+    Endpoint4
 
     # 启动 WARP Endpoint IP 优选工具
     chmod +x CloudflareST && ./CloudflareST >/dev/null 2>&1
