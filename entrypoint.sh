@@ -20,17 +20,21 @@ if [ "$(id -u)" -ne 0 ]; then
     exit 1
 fi
 
-ArchAffix() {
-    case "$(uname -m)" in
-    i386 | i686) echo '386' ;;
-    x86_64 | amd64) echo 'amd64' ;;
-    armv8 | arm64 | aarch64) echo 'arm64' ;;
-    arm*) echo "armv7" ;;
-    s390x) echo 's390x' ;;
-    *) red "不支持的CPU架构!" && exit 1 ;;
-    esac
-}
-
+osCheck=$(uname -a)
+if [[ $osCheck =~ 'x86_64' ]]; then
+    architecture="amd64"
+elif [[ $osCheck =~ 'arm64' ]] || [[ $osCheck =~ 'aarch64' ]]; then
+    architecture="arm64"
+elif [[ $osCheck =~ 'armv7l' ]]; then
+    architecture="armv7"
+elif [[ $osCheck =~ 'ppc64le' ]]; then
+    architecture="ppc64le"
+elif [[ $osCheck =~ 's390x' ]]; then
+    architecture="s390x"
+else
+    echo "暂不支持的系统架构，选择受支持的系统。"
+    exit 1
+fi
 init() {
     green "正在初始化..."
 
@@ -55,6 +59,11 @@ init() {
     green "复制配置文件..."
     cp -rf /opt/wgcf/wgcf-profile.conf /etc/wireguard/warp.conf
 
+    if [[ ! -e /etc/wireguard/warp.conf ]]; then
+        echo "warp.conf文件不存在"
+        exit 1
+    fi
+
     Start
 }
 
@@ -72,9 +81,7 @@ Endpoint_pref() {
     # 下载优选工具软件，感谢某匿名网友的分享的优选工具
     # wget https://gitlab.com/Misaka-blog/warp-script/-/raw/main/files/warp-yxip/warp-linux-$(archAffix) -O warp
     TAR="https://api.github.com/repos/XIU2/CloudflareSpeedTest/releases/latest"
-    ARCH=$(ArchAffix)
-    echo "${ARCH}"
-    URL=$(curl -fsSL ${TAR} | grep 'browser_download_url' | cut -d'"' -f4 | grep linux | grep "$(ArchAffix)")
+    URL=$(curl -fsSL ${TAR} | grep 'browser_download_url' | cut -d'"' -f4 | grep linux | grep "${architecture}")
     echo "${URL}"
 
     tar -xzf CloudflareST.tar.gz
@@ -101,15 +108,13 @@ Endpoint_pref() {
     else
         yellow "优选成功"
         # 替换 WireGuard 节点的默认的 Endpoint IP
-        sed -i "s|Endpoint = .*|Endpoint = $best_endpoint|" wgcf-profile.conf
+        sed -i "s/Endpoint = .*/Endpoint = $best_endpoint/" wgcf-profile.conf
     fi
 
     green "最佳 Endpoint IP = $best_endpoint 已设置完毕！"
 
     # yellow "使用方法如下："
     # yellow "1. 将 WireGuard 节点的默认的 Endpoint IP：engage.cloudflareclient.com:2408 替换成本地网络最优的 Endpoint IP"
-    # sed -i "s/engage.cloudflareclient.com:2408/$best_endpoint/g" /etc/wireguard/wgcf.conf
-    # sed -i "/Endpoint/s/.*/Endpoint = "$best_endpoint"/" warp.conf
     # 删除 WARP Endpoint IP 优选工具及其附属文件
     # rm -f warp ip.txt
 }
@@ -162,13 +167,13 @@ Endpoint4() {
         fi
     done
     while true; do
-        if [[ $(echo "${temp[@]}" | sed -e 's/ /\n/g' | sort -u | wc -l) -ge $iplist ]]; then
+        if [ $(echo ${temp[@]} | sed -e 's/ /\n/g' | sort -u | wc -l) -ge $iplist ]; then
             break
         else
-            temp["${n}"]=$(echo 162.159.192.$(($RANDOM % 256)))
+            temp[$n]=$(echo 162.159.192.$(($RANDOM % 256)))
             n=$(($n + 1))
         fi
-        if [[ $(echo "${temp[@]}" | sed -e 's/ /\n/g' | sort -u | wc -l) -ge $iplist ]]; then
+        if [ $(echo ${temp[@]} | sed -e 's/ /\n/g' | sort -u | wc -l) -ge $iplist ]; then
             break
         else
             temp[$n]=$(echo 162.159.193.$(($RANDOM % 256)))
@@ -213,8 +218,8 @@ Endpoint4() {
     done
 
     # 将生成的 IP 段列表放到 ip.txt 里，待程序优选
-    green "将生成的 IP 段列表放到 ip.txt 里，待程序优选..."
-    echo "${temp[@]}" | sed -e 's/ /\n/g' | sort -u > ip.txt
+    green "将生成的 IP 段列表放到 ip.txt 里，待程序优选"
+    echo ${temp[@]} | sed -e 's/ /\n/g' | sort -u >ip.txt
 }
 
 Start() {
@@ -231,14 +236,10 @@ Start() {
     echo
     green "OK, wgcf is up."
 
-    sleep infinity & wait
+    sleep infinity &
+    wait
 }
 
-green "启动"
+green "启动..."
 init
 exec "$@"
-# if command -v wgcf >/dev/null 2>&1; then
-#     init
-# else
-#     exec "$@"
-# fi

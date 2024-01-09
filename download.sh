@@ -1,28 +1,29 @@
 #!/bin/bash
 
-ArchAffix() {
-    case "$(uname -m)" in
-    i386 | i686) echo '386' ;;
-    x86_64 | amd64) echo 'amd64' ;;
-    armv8 | arm64 | aarch64) echo 'arm64' ;;
-    arm*) echo "armv7" ;;
-    s390x) echo 's390x' ;;
-    *) echo "不支持的CPU架构!" && exit 1 ;;
-    esac
-}
+set -e
 
-TAR="https://api.github.com/repos/XIU2/CloudflareSpeedTest/releases/latest"
-ARCH=$(ArchAffix)
-echo "${ARCH}"
-
-URL=$(curl -fsSL ${TAR} | grep 'browser_download_url' | cut -d'"' -f4 | grep linux | grep "$(ArchAffix)")
-echo "${URL}"
-
-if curl -sSL "${URL}" -o /opt/wgcf/CloudflareST.tar.gz 2>&1; then
-    echo "Download success"
+osCheck=$(uname -a)
+if [[ $osCheck =~ 'x86_64' ]];then
+    architecture="amd64"
+elif [[ $osCheck =~ 'arm64' ]] || [[ $osCheck =~ 'aarch64' ]];then
+    architecture="arm64"
+elif [[ $osCheck =~ 'armv7l' ]];then
+    architecture="armv7"
+elif [[ $osCheck =~ 'ppc64le' ]];then
+    architecture="ppc64le"
+elif [[ $osCheck =~ 's390x' ]];then
+    architecture="s390x"
 else
-    echo "Download failed"
+    echo "暂不支持的系统架构，选择受支持的系统。"
     exit 1
 fi
+
+TAR="https://api.github.com/repos/XIU2/CloudflareSpeedTest/releases/latest"
+
+URL=$(curl -fsSL ${TAR} | grep 'browser_download_url' | cut -d'"' -f4 | grep linux | grep "${architecture}")
+
+echo "${URL}"
+
+curl -sSL "${URL}" -o /opt/wgcf/CloudflareST.tar.gz
 
 exec "$@"
