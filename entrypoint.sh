@@ -46,16 +46,7 @@ init() {
         wgcf generate
     fi
 
-    DEFAULT_GATEWAY_NETWORK_CARD_NAME=$(route | grep default | awk '{print $8}' | head -1)
-    DEFAULT_ROUTE_IP=$(ifconfig $DEFAULT_GATEWAY_NETWORK_CARD_NAME | grep "inet " | awk '{print $2}' | sed "s/addr://")
-
-    echo ${DEFAULT_GATEWAY_NETWORK_CARD_NAME}
-    echo ${DEFAULT_ROUTE_IP}
-
-    sed -i "/\[Interface\]/a PostDown = ip rule delete from $DEFAULT_ROUTE_IP  lookup main" /opt/wgcf/wgcf-profile.conf
-    sed -i "/\[Interface\]/a PostUp = ip rule add from $DEFAULT_ROUTE_IP lookup main" /opt/wgcf/wgcf-profile.conf
-
-    Change_WireGuardProfile_V4
+    # Change_WireGuardProfile_V4
     # Change_WireGuardProfile_V6
 
     green "优选IP..."
@@ -63,6 +54,18 @@ init() {
 
     green "复制配置文件..."
     cp -rf /opt/wgcf/wgcf-profile.conf /etc/wireguard/warp.conf
+
+    DEFAULT_GATEWAY_NETWORK_CARD_NAME=$(route | grep default | awk '{print $8}' | head -1)
+    DEFAULT_ROUTE_IP=$(ifconfig $DEFAULT_GATEWAY_NETWORK_CARD_NAME | grep "inet " | awk '{print $2}' | sed "s/addr://")
+
+    echo ${DEFAULT_GATEWAY_NETWORK_CARD_NAME}
+    echo ${DEFAULT_ROUTE_IP}
+
+    sed -i "/\[Interface\]/a PostDown = ip rule delete from $DEFAULT_ROUTE_IP  lookup main" /etc/wireguard/wgcf.conf
+    sed -i "/\[Interface\]/a PostUp = ip rule add from $DEFAULT_ROUTE_IP lookup main" /etc/wireguard/wgcf.conf
+
+    sed -i 's/AllowedIPs = ::/#AllowedIPs = ::/' /etc/wireguard/wgcf.conf
+    sed -i '/^Address = \([0-9a-fA-F]\{1,4\}:\)\{7\}[0-9a-fA-F]\{1,4\}\/[0-9]\{1,3\}/s/^/#/' /etc/wireguard/wgcf.conf
 
     if [[ ! -e /etc/wireguard/warp.conf ]]; then
         echo "warp.conf文件不存在"
