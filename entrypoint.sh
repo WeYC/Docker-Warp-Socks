@@ -38,10 +38,6 @@ fi
 init() {
     green "正在初始化..."
 
-    IFACE=$(ip route show default | awk '{print $5}')
-    IPv4=$(ifconfig "$IFACE" | awk '/inet /{print $2}' | cut -d' ' -f2)
-    IPv6=$(ifconfig "$IFACE" | awk '/inet6 /{print $2}' | cut -d' ' -f2)
-
     if [ ! -e "/opt/wgcf/wgcf-account.toml" ]; then
         wgcf register --accept-tos
     fi
@@ -50,8 +46,17 @@ init() {
         wgcf generate
     fi
 
+    DEFAULT_GATEWAY_NETWORK_CARD_NAME=$(route | grep default | awk '{print $8}' | head -1)
+    DEFAULT_ROUTE_IP=$(ifconfig $DEFAULT_GATEWAY_NETWORK_CARD_NAME | grep "inet " | awk '{print $2}' | sed "s/addr://")
+
+    echo ${DEFAULT_GATEWAY_NETWORK_CARD_NAME}
+    echo ${DEFAULT_ROUTE_IP}
+
+    sed -i "/\[Interface\]/a PostDown = ip rule delete from $DEFAULT_ROUTE_IP  lookup main" /opt/wgcf/wgcf-profile.conf
+    sed -i "/\[Interface\]/a PostUp = ip rule add from $DEFAULT_ROUTE_IP lookup main" /opt/wgcf/wgcf-profile.conf
+
     Change_WireGuardProfile_V4
-    Change_WireGuardProfile_V6
+    # Change_WireGuardProfile_V6
 
     green "优选IP..."
     Endpoint_pref
@@ -68,17 +73,21 @@ init() {
 }
 
 Change_WireGuardProfile_V4() {
-    sed -i "/\[Interface\]/a PostDown = ip -4 rule delete from ${IPv4} lookup main" /opt/wgcf/wgcf-profile.conf
-    sed -i "/\[Interface\]/a PostUp = ip -4 rule add from ${IPv4} lookup main" /opt/wgcf/wgcf-profile.conf
+    sed -i 's/AllowedIPs = ::/#AllowedIPs = ::/' /etc/wireguard/wgcf.conf
+    sed -i '/^Address = \([0-9a-fA-F]\{1,4\}:\)\{7\}[0-9a-fA-F]\{1,4\}\/[0-9]\{1,3\}/s/^/#/' /opt/wgcf/wgcf-profile.conf
 }
 
-Change_WireGuardProfile_V6() {
-    sed -i "/\[Interface\]/a PostDown = ip -6 rule delete from ${IPv6}  lookup main" /opt/wgcf/wgcf-profile.conf
-    sed -i "/\[Interface\]/a PostUp = ip -6 rule add from ${IPv6} lookup main" /opt/wgcf/wgcf-profile.conf
-}
+# Change_WireGuardProfile_V6() {
+#     sed -i 's/AllowedIPs = 0.0.0.0/#AllowedIPs = 0.0.0.0/' /etc/wireguard/wgcf.conf
+# }
 
 Endpoint_pref() {
-    tar -xzf CloudflareST.tar.gz
+
+    if [[ -e CloudflareST.tar.gz ]]; then
+        tar -xzf CloudflareST.tar.gz
+    else
+        echo "CloudflareST.tar.gz文件不存在"
+    fi
 
     # 取消 Linux 自带的线程限制，以便生成优选 Endpoint IP
     ulimit -n 102400
