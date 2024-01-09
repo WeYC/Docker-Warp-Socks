@@ -78,12 +78,6 @@ Change_WireGuardProfile_V6() {
 }
 
 Endpoint_pref() {
-    # 下载优选工具软件，感谢某匿名网友的分享的优选工具
-    # wget https://gitlab.com/Misaka-blog/warp-script/-/raw/main/files/warp-yxip/warp-linux-$(archAffix) -O warp
-    TAR="https://api.github.com/repos/XIU2/CloudflareSpeedTest/releases/latest"
-    URL=$(curl -fsSL ${TAR} | grep 'browser_download_url' | cut -d'"' -f4 | grep linux | grep "${architecture}")
-    echo "${URL}"
-
     tar -xzf CloudflareST.tar.gz
 
     # 取消 Linux 自带的线程限制，以便生成优选 Endpoint IP
@@ -108,7 +102,8 @@ Endpoint_pref() {
     else
         yellow "优选成功"
         # 替换 WireGuard 节点的默认的 Endpoint IP
-        sed -i "s/Endpoint = .*/Endpoint = $best_endpoint/" wgcf-profile.conf
+        echo "${best_endpoint}"
+        sed -i "s/Endpoint = .*/Endpoint = ${best_endpoint}/" wgcf-profile.conf
     fi
 
     green "最佳 Endpoint IP = $best_endpoint 已设置完毕！"
