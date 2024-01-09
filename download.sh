@@ -3,6 +3,7 @@
 set -e
 
 osCheck=$(uname -a)
+echo "ARCHITECTURE: $osCheck"
 if [[ $osCheck =~ 'x86_64' ]];then
     architecture="amd64"
 elif [[ $osCheck =~ 'arm64' ]] || [[ $osCheck =~ 'aarch64' ]];then
