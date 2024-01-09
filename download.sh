@@ -3,15 +3,12 @@
 set -e
 
 osCheck=$(uname -a)
-echo "ARCHITECTURE: $osCheck"
 if [[ $osCheck =~ 'x86_64' ]];then
     architecture="amd64"
 elif [[ $osCheck =~ 'arm64' ]] || [[ $osCheck =~ 'aarch64' ]];then
     architecture="arm64"
 elif [[ $osCheck =~ 'armv7l' ]];then
     architecture="armv7"
-elif [[ $osCheck =~ 'ppc64le' ]];then
-    architecture="ppc64le"
 elif [[ $osCheck =~ 's390x' ]];then
     architecture="s390x"
 else

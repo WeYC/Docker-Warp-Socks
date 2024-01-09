@@ -87,7 +87,7 @@ Change_WireGuardProfile_V4() {
 Endpoint_pref() {
 
     if [[ -e CloudflareST.tar.gz ]]; then
-        tar -xzf CloudflareST.tar.gz
+        tar -xzf /opt/wgcf/CloudflareST.tar.gz
     else
         echo "CloudflareST.tar.gz文件不存在"
     fi
