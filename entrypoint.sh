@@ -73,7 +73,7 @@ init() {
 }
 
 Change_WireGuardProfile_V4() {
-    sed -i 's/AllowedIPs = ::/#AllowedIPs = ::/' /etc/wireguard/wgcf.conf
+    sed -i 's/AllowedIPs = ::/#AllowedIPs = ::/' /opt/wgcf/wgcf-profile.conf
     sed -i '/^Address = \([0-9a-fA-F]\{1,4\}:\)\{7\}[0-9a-fA-F]\{1,4\}\/[0-9]\{1,3\}/s/^/#/' /opt/wgcf/wgcf-profile.conf
 }
 
