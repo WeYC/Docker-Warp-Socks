@@ -22,7 +22,7 @@ URL=$(curl -fsSL ${TAR} | grep 'browser_download_url' | cut -d'"' -f4 | grep lin
 
 echo "${URL}"
 
-if curl -sSL "${URL}" -o /wgcf/CloudflareST.tar.gz; then
+if curl -sSL "${URL}" -o CloudflareST.tar.gz; then
     echo "下载成功"
 else
     echo "下载失败"
