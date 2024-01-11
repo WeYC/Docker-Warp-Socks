@@ -11,11 +11,11 @@ RUN apt-get -qq update \
 
 RUN curl -fsSL git.io/wgcf.sh | bash
 
-RUN mkdir -p /opt/wgcf
+RUN mkdir -p /wgcf
 
-WORKDIR /opt/wgcf
+WORKDIR /wgcf
 
-VOLUME /opt/wgcf
+VOLUME /wgcf
 
 COPY download.sh /tmp/download.sh
 RUN chmod +x /tmp/download.sh && /tmp/download.sh

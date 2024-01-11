@@ -23,14 +23,12 @@ fi
 osCheck=$(uname -a)
 if [[ $osCheck =~ 'x86_64' ]]; then
     architecture="amd64"
+elif [[ $osCheck =~ 'i386' ]]; then
+    architecture="386"
 elif [[ $osCheck =~ 'arm64' ]] || [[ $osCheck =~ 'aarch64' ]]; then
     architecture="arm64"
 elif [[ $osCheck =~ 'armv7l' ]]; then
     architecture="armv7"
-elif [[ $osCheck =~ 'ppc64le' ]]; then
-    architecture="ppc64le"
-elif [[ $osCheck =~ 's390x' ]]; then
-    architecture="s390x"
 else
     echo "暂不支持的系统架构，选择受支持的系统。"
     exit 1
@@ -38,11 +36,11 @@ fi
 init() {
     green "正在初始化..."
 
-    if [ ! -e "/opt/wgcf/wgcf-account.toml" ]; then
+    if [ ! -e "/wgcf/wgcf-account.toml" ]; then
         wgcf register --accept-tos
     fi
 
-    if [ ! -e "/opt/wgcf/wgcf-profile.conf" ]; then
+    if [ ! -e "/wgcf/wgcf-profile.conf" ]; then
         wgcf generate
     fi
 
@@ -53,7 +51,7 @@ init() {
     Endpoint_pref
 
     green "复制配置文件..."
-    cp -rf /opt/wgcf/wgcf-profile.conf /etc/wireguard/warp.conf
+    cp -rf /wgcf/wgcf-profile.conf /etc/wireguard/warp.conf
 
     DEFAULT_GATEWAY_NETWORK_CARD_NAME=$(route | grep default | awk '{print $8}' | head -1)
     DEFAULT_ROUTE_IP=$(ifconfig $DEFAULT_GATEWAY_NETWORK_CARD_NAME | grep "inet " | awk '{print $2}' | sed "s/addr://")
@@ -76,8 +74,8 @@ init() {
 }
 
 Change_WireGuardProfile_V4() {
-    sed -i 's/AllowedIPs = ::/#AllowedIPs = ::/' /opt/wgcf/wgcf-profile.conf
-    sed -i '/^Address = \([0-9a-fA-F]\{1,4\}:\)\{7\}[0-9a-fA-F]\{1,4\}\/[0-9]\{1,3\}/s/^/#/' /opt/wgcf/wgcf-profile.conf
+    sed -i 's/AllowedIPs = ::/#AllowedIPs = ::/' /wgcf/wgcf-profile.conf
+    sed -i '/^Address = \([0-9a-fA-F]\{1,4\}:\)\{7\}[0-9a-fA-F]\{1,4\}\/[0-9]\{1,3\}/s/^/#/' /wgcf/wgcf-profile.conf
 }
 
 # Change_WireGuardProfile_V6() {
@@ -86,10 +84,10 @@ Change_WireGuardProfile_V4() {
 
 Endpoint_pref() {
 
-    if [[ -e "/opt/wgcf/CloudflareST.tar.gz" ]]; then
-        tar -xzf /opt/wgcf/CloudflareST.tar.gz
+    if [[ -e "CloudflareST.tar.gz" ]]; then
+        tar -xzf CloudflareST.tar.gz
     else
-        echo "CloudflareST.tar.gz文件不存在"
+        echo "CloudflareST.tar.gz 文件不存在"
     fi
 
     # 取消 Linux 自带的线程限制，以便生成优选 Endpoint IP
@@ -249,4 +247,3 @@ Start() {
 
 green "启动..."
 init
-exec "$@"

@@ -3,14 +3,14 @@
 set -e
 
 osCheck=$(uname -a)
-if [[ $osCheck =~ 'x86_64' ]];then
+if [[ $osCheck =~ 'x86_64' ]]; then
     architecture="amd64"
-elif [[ $osCheck =~ 'arm64' ]] || [[ $osCheck =~ 'aarch64' ]];then
+elif [[ $osCheck =~ 'i386' ]]; then
+    architecture="386"
+elif [[ $osCheck =~ 'arm64' ]] || [[ $osCheck =~ 'aarch64' ]]; then
     architecture="arm64"
-elif [[ $osCheck =~ 'armv7l' ]];then
+elif [[ $osCheck =~ 'armv7l' ]]; then
     architecture="armv7"
-elif [[ $osCheck =~ 's390x' ]];then
-    architecture="s390x"
 else
     echo "暂不支持的系统架构，选择受支持的系统。"
     exit 1
@@ -22,6 +22,9 @@ URL=$(curl -fsSL ${TAR} | grep 'browser_download_url' | cut -d'"' -f4 | grep lin
 
 echo "${URL}"
 
-curl -sSL "${URL}" -o /opt/wgcf/CloudflareST.tar.gz
-
-exec "$@"
+if curl -sSL "${URL}" -o /wgcf/CloudflareST.tar.gz; then
+    echo "下载成功"
+else
+    echo "下载失败"
+    exit 1
+fi
