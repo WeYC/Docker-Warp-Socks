@@ -36,6 +36,3 @@ else
 fi
 ls -a
 chmod +x ${BIN_NAME}
-echo "[INFO] Add ${BIN_FILE}"
-ln -sf ${BIN_FILE} /usr/bin/${BIN_NAME}
-warp -h
