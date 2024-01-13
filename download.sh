@@ -36,10 +36,8 @@ else
 fi
 ls -a
 chmod +x ${BIN_NAME}
-if [[ ! $(echo ${PATH} | grep ${BIN_DIR}) ]]; then
-    echo "[INFO] Add ${BIN_FILE}"
-    ln -sf ${BIN_FILE} /usr/bin/${BIN_NAME}
-fi
+echo "[INFO] Add ${BIN_FILE}"
+ln -sf ${BIN_FILE} /usr/bin/${BIN_NAME}
 if [[ -s ${BIN_FILE} && $(${BIN_NAME} -h) ]]; then
     echo -e "[INFO] Done."
 else
