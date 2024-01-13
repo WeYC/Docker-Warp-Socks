@@ -18,7 +18,7 @@ fi
 
 TAR="https://api.github.com/repos/XIU2/CloudflareSpeedTest/releases/latest"
 
-URL=$(curl -fsSL ${TAR} | grep 'browser_download_url' | cut -d'"' -f4 | grep linux | grep "$architecture}")
+URL=$(curl -fsSL ${TAR} | grep 'browser_download_url' | cut -d'"' -f4 | grep linux | grep "$architecture")
 
 echo "${URL}"
 

@@ -1,3 +1,7 @@
-version: '3'
+version: "3"
 services:
-    server:
+  warp_socks:
+    restart: unless-stopped
+    volumes:
+      - ./warp/: /warp/
+    image: weycovo/docker-warp_socks:latest
