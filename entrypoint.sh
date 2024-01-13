@@ -30,9 +30,11 @@ elif [[ $osCheck =~ 'arm64' ]] || [[ $osCheck =~ 'aarch64' ]]; then
 elif [[ $osCheck =~ 'armv7l' ]]; then
     architecture="armv7"
 else
+    echo "$architecture"
     echo "暂不支持的系统架构，选择受支持的系统。"
     exit 1
 fi
+
 init() {
     green "正在初始化..."
 
@@ -53,6 +55,11 @@ init() {
     green "复制配置文件..."
     cp -rf /wgcf/wgcf-profile.conf /etc/wireguard/warp.conf
 
+    if [[ ! -e /etc/wireguard/warp.conf ]]; then
+        echo "warp.conf文件不存在"
+        exit 1
+    fi
+
     DEFAULT_GATEWAY_NETWORK_CARD_NAME=$(route | grep default | awk '{print $8}' | head -1)
     DEFAULT_ROUTE_IP=$(ifconfig $DEFAULT_GATEWAY_NETWORK_CARD_NAME | grep "inet " | awk '{print $2}' | sed "s/addr://")
 
@@ -64,11 +71,6 @@ init() {
 
     sed -i 's/AllowedIPs = ::/#AllowedIPs = ::/' /etc/wireguard/wgcf.conf
     sed -i '/^Address = \([0-9a-fA-F]\{1,4\}:\)\{7\}[0-9a-fA-F]\{1,4\}\/[0-9]\{1,3\}/s/^/#/' /etc/wireguard/wgcf.conf
-
-    if [[ ! -e /etc/wireguard/warp.conf ]]; then
-        echo "warp.conf文件不存在"
-        exit 1
-    fi
 
     Start
 }
