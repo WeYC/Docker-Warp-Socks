@@ -14,27 +14,6 @@ yellow() {
     echo -e "\033[33m\033[01m$1\033[0m"
 }
 
-# 检查是否以ROOT用户运行
-if [ "$(id -u)" -ne 0 ]; then
-    red "请使用ROOT用户运行此脚本。"
-    exit 1
-fi
-
-osCheck=$(uname -a)
-if [[ $osCheck =~ 'x86_64' ]]; then
-    architecture="amd64"
-elif [[ $osCheck =~ 'i386' ]]; then
-    architecture="386"
-elif [[ $osCheck =~ 'arm64' ]] || [[ $osCheck =~ 'aarch64' ]]; then
-    architecture="arm64"
-elif [[ $osCheck =~ 'armv7l' ]]; then
-    architecture="armv7"
-else
-    echo "$architecture"
-    echo "暂不支持的系统架构，选择受支持的系统。"
-    exit 1
-fi
-
 init() {
     green "正在初始化..."
 
@@ -45,9 +24,6 @@ init() {
     if [ ! -e "/wgcf/wgcf-profile.conf" ]; then
         wgcf generate
     fi
-
-    # Change_WireGuardProfile_V4
-    # Change_WireGuardProfile_V6
 
     green "优选IP..."
     Endpoint_pref
@@ -75,10 +51,10 @@ init() {
     Start
 }
 
-Change_WireGuardProfile_V4() {
-    sed -i 's/AllowedIPs = ::/#AllowedIPs = ::/' /wgcf/wgcf-profile.conf
-    sed -i '/^Address = \([0-9a-fA-F]\{1,4\}:\)\{7\}[0-9a-fA-F]\{1,4\}\/[0-9]\{1,3\}/s/^/#/' /wgcf/wgcf-profile.conf
-}
+# Change_WireGuardProfile_V4() {
+#     sed -i 's/AllowedIPs = ::/#AllowedIPs = ::/' /wgcf/wgcf-profile.conf
+#     sed -i '/^Address = \([0-9a-fA-F]\{1,4\}:\)\{7\}[0-9a-fA-F]\{1,4\}\/[0-9]\{1,3\}/s/^/#/' /wgcf/wgcf-profile.conf
+# }
 
 # Change_WireGuardProfile_V6() {
 #     sed -i 's/AllowedIPs = 0.0.0.0/#AllowedIPs = 0.0.0.0/' /etc/wireguard/wgcf.conf
@@ -120,9 +96,6 @@ Endpoint_pref() {
 
     green "最佳 Endpoint IP = $best_endpoint 已设置完毕！"
 
-    # yellow "使用方法如下："
-    # yellow "1. 将 WireGuard 节点的默认的 Endpoint IP：engage.cloudflareclient.com:2408 替换成本地网络最优的 Endpoint IP"
-    # 删除 WARP Endpoint IP 优选工具及其附属文件
     # rm -f warp ip.txt
 }
 
@@ -248,4 +221,5 @@ Start() {
 }
 
 green "启动..."
-init
+# init
+echo "$PWD"

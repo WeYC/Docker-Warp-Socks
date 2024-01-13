@@ -2,6 +2,8 @@
 
 set -e
 
+echo "$PWD"
+
 ArchAffix() {
     case "$(uname -m)" in
     i386 | i686) echo '386' ;;
