@@ -34,7 +34,7 @@ if [[ -e CloudflareST.tar.gz ]]; then
 else
     echo "Download failed"
 fi
-
+ls -a
 chmod +x ${BIN_NAME}
 if [[ ! $(echo ${PATH} | grep ${BIN_DIR}) ]]; then
     ln -sf ${BIN_FILE} /usr/bin/${BIN_NAME}
