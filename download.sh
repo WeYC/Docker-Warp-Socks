@@ -21,7 +21,7 @@ URL=$(curl -fsSL ${TAR} | grep 'browser_download_url' | cut -d'"' -f4 | grep lin
 
 echo "${URL}"
 
-if curl "${URL}" -o CloudflareST.tar.gz 2>&1; then
+if curl -fsSL "${URL}" -o CloudflareST.tar.gz 2>&1; then
     echo "Download success"
 else
     echo "Download failed"

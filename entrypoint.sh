@@ -223,3 +223,4 @@ Start() {
 green "启动..."
 # init
 echo "$PWD"
+ls
