@@ -25,6 +25,7 @@ curl -fsSL "${URL}" -o CloudflareST.tar.gz
 
 if [[ -e CloudflareST.tar.gz ]]; then
     echo "Download success"
+    tar -xzf CloudflareST.tar.gz
 else
     echo "Download failed"
 fi
