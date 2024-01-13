@@ -38,9 +38,4 @@ ls -a
 chmod +x ${BIN_NAME}
 echo "[INFO] Add ${BIN_FILE}"
 ln -sf ${BIN_FILE} /usr/bin/${BIN_NAME}
-if [[ $(${BIN_NAME} -h) ]]; then
-    echo -e "[INFO] Done."
-else
-    echo -e "[ERROR] ${PROJECT_NAME} installation failed !"
-    exit 1
-fi
+warp -h
