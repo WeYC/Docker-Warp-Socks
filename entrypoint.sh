@@ -62,11 +62,11 @@ init() {
 
 Endpoint_pref() {
 
-    if [[ -e "CloudflareST.tar.gz" ]]; then
-        tar -xzf CloudflareST.tar.gz
-    else
-        echo "CloudflareST.tar.gz 文件不存在"
-    fi
+    # if [[ -e "CloudflareST.tar.gz" ]]; then
+    #     tar -xzf CloudflareST.tar.gz
+    # else
+    #     echo "CloudflareST.tar.gz 文件不存在"
+    # fi
 
     # 取消 Linux 自带的线程限制，以便生成优选 Endpoint IP
     ulimit -n 102400
@@ -74,7 +74,7 @@ Endpoint_pref() {
     Endpoint4
 
     # 启动 WARP Endpoint IP 优选工具
-    chmod +x CloudflareST && ./CloudflareST >/dev/null 2>&1
+    ./warp >/dev/null 2>&1
 
     green "当前最优 Endpoint IP 结果如下，并已保存至 result.csv中："
     cat result.csv | awk -F, '$3!="timeout ms" {print} ' | sort -t, -nk2 -nk3 | uniq | head -11 | awk -F, '{print "端点 "$1" 丢包率 "$2" 平均延迟 "$3}'
@@ -221,6 +221,4 @@ Start() {
 }
 
 green "启动..."
-# init
-echo "$PWD"
-ls -a
+Endpoint_pref

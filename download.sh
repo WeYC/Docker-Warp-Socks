@@ -1,8 +1,14 @@
 #!/bin/bash
 
-set -e
+set -o errexit
+set -o errtrace
+set -o pipefail
 
-echo "$PWD"
+PROJECT_NAME='warp'
+GH_API_URL='https://api.github.com/repos/XIU2/CloudflareSpeedTest/releases/latest'
+BIN_DIR='/usr/local/bin'
+BIN_NAME='warp'
+BIN_FILE="${BIN_DIR}/${BIN_NAME}"
 
 ArchAffix() {
     case "$(uname -m)" in
@@ -15,19 +21,27 @@ ArchAffix() {
     esac
 }
 
-TAR="https://api.github.com/repos/XIU2/CloudflareSpeedTest/releases/latest"
-
-URL=$(curl -fsSL ${TAR} | grep 'browser_download_url' | cut -d'"' -f4 | grep linux | grep "$(ArchAffix)")
+URL=$(curl -fsSL ${GH_API_URL} | grep 'browser_download_url' | cut -d'"' -f4 | grep linux | grep "$(ArchAffix)")
 
 echo "${URL}"
 
-curl -fsSL "${URL}" -o CloudflareST.tar.gz
+curl -SL "${URL}" -o CloudflareST.tar.gz
 
 if [[ -e CloudflareST.tar.gz ]]; then
     echo "Download success"
     tar -xzf CloudflareST.tar.gz
+    mv CloudflareST ${BIN_NAME}
 else
     echo "Download failed"
 fi
 
-exec "$@"
+chmod +x ${BIN_NAME}
+if [[ ! $(echo ${PATH} | grep ${BIN_DIR}) ]]; then
+    ln -sf ${BIN_FILE} /usr/bin/${BIN_NAME}
+fi
+if [[ -s ${BIN_FILE} && $(${BIN_NAME} -h) ]]; then
+    echo -e "[INFO] Done."
+else
+    echo -e "[ERROR] ${PROJECT_NAME} installation failed !"
+    exit 1
+fi
